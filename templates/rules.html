@@ -2,26 +2,169 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/css/style_rules.css" />
     <link rel="stylesheet" href="/static/css/style.css" />
     <title>Meowdex</title>
 </head>
 <body>
     <div class="background"></div>
     <div class="rules-container">
-        <div class="rules_grid"> <img src="/static/data/images/background/rules_grid.png"></div>
+        <div class="rules_grid"> <img src="/static/data/images/background/grid_rul_set.png"></div>
 
         <div class="text-overlay">
-            <h1>Rules game</h1>
-            <p>text rules</p>
+            <h1>ПРАВИЛА ИГРЫ</h1>
+            <ul>
+                <li>Угадай слово за ограниченное число попыток</li>
+            </ul>
         </div>
     </div>
-
+<div class="sleeping-cat" id="sleepingCat">
+    <img src="/static/data/images/button/cats_btn/sleeping_cat.png" alt="Спящий котик" class="cat-sprite" id="catSprite" onerror="this.src='https://cataas.com/cat?width=100&height=100'">
+</div>
 <div class="back-btn">
      <a href="/" class="btn-link">
          <button class="btn" onclick="handleButtonClick('/')">
-             <img src="/static/data/images/button/home_btn.png" alt="Кнопка играть">
+             <img src="/static/data/images/button/home_btn.png" alt="Кнопка главная">
          </button>
      </a>
 </div>
+
+<div id="shurikModal" class="shurik-modal">
+    <div class="shurik-content">
+        <div class="shurik-image-container">
+            <img src="/static/data/images/cats/shurik.png" alt="Кот Шурик" class="shurik-image" onerror="this.src='https://cataas.com/cat?width=800&height=600'">
+            <div class="replica-container">
+                <img src="/static/data/images/icons/replica_line.png" alt="Реплика" class="replica-image">
+                <span class="replica-text-overlay">НЕ БУДИ ВО МНЕ ЗВЕРЯ!</span>
+            </div>
+        </div>
+        <div class="back-btn">
+            <a href="/rules" class="btn-link">
+                <button class="btn" onclick="closeShurik()">
+                    <img src="/static/data/images/button/home_btn.png" alt="Кнопка главная">
+                </button>
+            </a>
+        </div>
+    </div>
+</div>
+
+    <audio id="angrySound" preload="auto">
+        <source src="/static/sounds/angry_cat.mp3" type="audio/mpeg">
+        Ваш браузер не поддерживает аудио элемент
+    </audio>
+<script>
+        let catClicked = false;
+        let timeoutId = null;
+
+        document.getElementById('sleepingCat').addEventListener('click', function() {
+            if (catClicked) return; // Чтобы нельзя было нажать несколько раз
+
+            catClicked = true;
+            const catSprite = document.getElementById('catSprite');
+
+            // Меняем спрайт на разбуженного кота
+            catSprite.src = '/static/data/images/cat/awake_cat.png';
+
+            // Добавляем эффект встряски для котика
+            document.getElementById('sleepingCat').classList.add('cat-shake');
+
+            // Сразу показываем злого Шурика через 0.1 секунды (почти мгновенно)
+            timeoutId = setTimeout(function() {
+                showAngryShurik();
+            }, 100);
+        });
+
+        function showAngryShurik() {
+            const modal = document.getElementById('shurikModal');
+            modal.style.display = 'flex';
+
+            // Встряска всего экрана
+            document.body.classList.add('shake');
+
+            // Проигрываем злой звук
+            playAngrySound();
+
+            // Убираем встряску через 0.5 секунды
+            setTimeout(() => {
+                document.body.classList.remove('shake');
+            }, 500);
+        }
+
+        function resetCat() {
+            const catSprite = document.getElementById('catSprite');
+            catSprite.src = '/static/data/images/cat/sleeping_cat.png';
+            document.getElementById('sleepingCat').classList.remove('cat-shake');
+            catClicked = false;
+
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+                timeoutId = null;
+            }
+        }
+
+        function closeShurik() {
+            const modal = document.getElementById('shurikModal');
+            modal.style.display = 'none';
+            resetCat();
+        }
+
+        function playAngrySound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                // Низкий рычащий звук
+                oscillator.frequency.value = 150;
+                gainNode.gain.value = 0.3;
+
+                oscillator.start();
+
+                // Нарастание звука
+                gainNode.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.5);
+
+                setTimeout(() => {
+                    oscillator.frequency.value = 100;
+                }, 100);
+
+                setTimeout(() => {
+                    oscillator.frequency.value = 80;
+                }, 200);
+
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch(e) {
+                console.log('Р-Р-Р-Р!');
+            }
+        }
+
+        // При наведении на спящего кота
+        document.getElementById('sleepingCat').addEventListener('mouseenter', function() {
+            if (!catClicked) {
+                this.style.transform = 'scale(1.05)';
+            }
+        });
+
+        document.getElementById('sleepingCat').addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('shurikModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+                resetCat();
+            }
+        }
+
+        function handleButtonClick(url) {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+            window.location.href = url;
+        }
+    </script>
 </body>
 </html>

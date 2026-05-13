@@ -2,11 +2,70 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/static/css/style.css" />
-    <title>Meowdex</title>
+    <link rel="stylesheet" href="/static/css/style_game.css" />
+    <title>Meowdex - Игра</title>
 </head>
 <body>
     <div class="background"></div>
 
+    <div class="game-container">
+        <div class="game_grid">
+            <img src="/static/data/images/background/grid.png" alt="Игровое поле">
+        </div>
+
+        <div class="keyboard-container">
+            <div class="keyboard-row">
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Й.png" alt="Й"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Ц.png" alt="Ц"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_У.png" alt="У"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_К.png" alt="К"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Е.png" alt="Е"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Н.png" alt="Н"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Г.png" alt="Г"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Ш.png" alt="Ш"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Щ.png" alt="Щ"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_З.png" alt="З"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Х.png" alt="Х"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Ъ.png" alt="Ъ"></button>
+            </div>
+            <div class="keyboard-row">
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Ф.png" alt="Ф"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Ы.png" alt="Ы"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_В.png" alt="В"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_А.png" alt="А"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_П.png" alt="П"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Р.png" alt="Р"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_О.png" alt="О"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Л.png" alt="Л"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Д.png" alt="Д"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Ж.png" alt="Ж"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Э.png" alt="Э"></button>
+            </div>
+            <div class="keyboard-row">
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Я.png" alt="Я"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Ч.png" alt="Ч"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_С.png" alt="С"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_М.png" alt="М"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_И.png" alt="И"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Т.png" alt="Т"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Ь.png" alt="Ь"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Б.png" alt="Б"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Ю.png" alt="Ю"></button>
+                <button class="key-btn"><img src="/static/data/images/button/keyboard_btn/Ч_Ё.png" alt="Ё"></button>
+            </div>
+        </div>
+
+        <div class="back-btn-game">
+            <a href="/" class="btn-link">
+                <button class="btn-game">
+                    <img src="/static/data/images/button/home_btn.png" alt="Назад">
+                </button>
+            </a>
+        </div>
+    </div>
+<audio id="clickSound" preload="auto">
+        <source src="/static/sounds/click.mp3" type="audio/mpeg">
+</audio>
+    <script src="/static/js/game.js"></script>
 </body>
 </html>
