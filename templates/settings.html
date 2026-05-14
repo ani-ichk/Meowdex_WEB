@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/static/css/style.css"/>
     <link rel="stylesheet" href="/static/css/style_settings.css"/>
-    <script src="/static/js/script.js" defer></script>
-    <title>Настройки  Meowdex</title>
+    <title>Настройки Meowdex</title>
 </head>
 <body>
     <div class="background"></div>
@@ -15,11 +14,11 @@
         </div>
 
         <div class="settings-overlay">
-            <h1>Настройки</h1>
+            <h1>⚙️ НАСТРОЙКИ</h1>
 
             <div class="setting-item">
                 <div class="setting-label">
-                    <span>Громкость музыки</span>
+                    <span>🎵 ГРОМКОСТЬ МУЗЫКИ</span>
                     <span class="volume-value" id="volumeValue">50%</span>
                 </div>
                 <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="50">
@@ -27,10 +26,20 @@
 
             <div class="setting-item">
                 <div class="setting-label">
-                    <span>Звук клавиатуры</span>
+                    <span>🔊 ЗВУК КЛАВИАТУРЫ</span>
                 </div>
                 <label class="checkbox-wrapper">
-                    <input type="checkbox" id="keyboardSoundToggle">
+                    <input type="checkbox" id="keyboardSoundToggle" checked>
+                    <span class="checkbox-custom"></span>
+                </label>
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-label">
+                    <span>🐱 РЕПЛИКИ ПЕРСОНАЖЕЙ</span>
+                </div>
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" id="dialogToggle" checked>
                     <span class="checkbox-custom"></span>
                 </label>
             </div>
@@ -39,11 +48,115 @@
 
     <div class="back-btn">
         <a href="/" class="btn-link">
-            <button class="btn" onclick="handleButtonClick('/')">
+            <button class="btn" onclick="saveAndGoBack()">
                 <img src="/static/data/images/button/home_btn.png" alt="Назад">
             </button>
         </a>
     </div>
 
+    <div id="toast" class="saved-toast">НАСТРОЙКИ СОХРАНЕНЫ!</div>
+
+    <script>
+        // Загрузка настроек
+        async function loadSettings() {
+            try {
+                const response = await fetch('/get_settings');
+                const settings = await response.json();
+
+                document.getElementById('volumeSlider').value = settings.volume || 50;
+                document.getElementById('volumeValue').textContent = (settings.volume || 50) + '%';
+                document.getElementById('keyboardSoundToggle').checked = settings.keyboardSound !== false;
+                document.getElementById('dialogToggle').checked = settings.dialogSound !== false;
+
+                // Применяем настройки к игре, если она открыта
+                if (window.updateGameSettings) {
+                    window.updateGameSettings(settings.volume || 50, settings.keyboardSound !== false);
+                }
+
+            } catch (error) {
+                console.log('Ошибка загрузки настроек');
+                // Загружаем из localStorage
+                const savedSettings = localStorage.getItem('meowdex_settings');
+                if (savedSettings) {
+                    const settings = JSON.parse(savedSettings);
+                    document.getElementById('volumeSlider').value = settings.volume || 50;
+                    document.getElementById('volumeValue').textContent = (settings.volume || 50) + '%';
+                    document.getElementById('keyboardSoundToggle').checked = settings.keyboardSound !== false;
+                    document.getElementById('dialogToggle').checked = settings.dialogSound !== false;
+                }
+            }
+        }
+
+        // Сохранение настроек
+        async function saveSettings() {
+            const volume = document.getElementById('volumeSlider').value;
+            const keyboardSound = document.getElementById('keyboardSoundToggle').checked;
+            const dialogSound = document.getElementById('dialogToggle').checked;
+
+            const settings = {
+                volume: parseInt(volume),
+                keyboardSound: keyboardSound,
+                dialogSound: dialogSound,
+                timestamp: new Date().toISOString()
+            };
+
+            // Сохраняем в localStorage
+            localStorage.setItem('meowdex_settings', JSON.stringify(settings));
+
+            // Отправляем на сервер
+            try {
+                await fetch('/save_settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(settings)
+                });
+            } catch (error) {
+                console.log('Ошибка сохранения на сервере');
+            }
+
+            // Применяем настройки к игре, если она открыта
+            if (window.updateGameSettings) {
+                window.updateGameSettings(volume, keyboardSound);
+            }
+
+            // Показываем уведомление
+            showToast();
+        }
+
+        // Отображение значения громкости
+        document.getElementById('volumeSlider').addEventListener('input', function() {
+            document.getElementById('volumeValue').textContent = this.value + '%';
+        });
+
+        // Сохранение при изменении
+        document.getElementById('volumeSlider').addEventListener('change', saveSettings);
+        document.getElementById('keyboardSoundToggle').addEventListener('change', saveSettings);
+        document.getElementById('dialogToggle').addEventListener('change', saveSettings);
+
+        // Показать уведомление
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // Сохранить и вернуться на главную
+        async function saveAndGoBack() {
+            await saveSettings();
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 300);
+        }
+
+        function handleButtonClick(url) {
+            saveSettings();
+            window.location.href = url;
+        }
+
+        // Загружаем настройки при открытии
+        loadSettings();
+    </script>
 </body>
 </html>
