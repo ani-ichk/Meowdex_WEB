@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/static/css/style.css"/>
+    <link rel="stylesheet" href="/static/css/style_settings.css"/>
+    <script src="/static/js/script.js" defer></script>
+    <title>Настройки  Meowdex</title>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="settings-container">
+        <div class="settings_grid">
+            <img src="/static/data/images/background/grid_rul_set.png" alt="Фон настроек">
+        </div>
+
+        <div class="settings-overlay">
+            <h1>Настройки</h1>
+
+            <div class="setting-item">
+                <div class="setting-label">
+                    <span>Громкость музыки</span>
+                    <span class="volume-value" id="volumeValue">50%</span>
+                </div>
+                <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="50">
+            </div>
+
+            <div class="setting-item">
+                <div class="setting-label">
+                    <span>Звук клавиатуры</span>
+                </div>
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" id="keyboardSoundToggle">
+                    <span class="checkbox-custom"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="back-btn">
+        <a href="/" class="btn-link">
+            <button class="btn" onclick="handleButtonClick('/')">
+                <img src="/static/data/images/button/home_btn.png" alt="Назад">
+            </button>
+        </a>
+    </div>
+
+</body>
+</html>
