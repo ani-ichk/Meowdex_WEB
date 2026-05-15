@@ -6,7 +6,6 @@ let wordLength = 5;
 let gameBoard = [];
 let keyboardSoundEnabled = true;
 let dialogSoundEnabled = true;
-let characterVoiceEnabled = true;
 let isWaitingResponse = false;
 let musicEnabled = true;
 let isGameOver = false;
@@ -16,15 +15,9 @@ let bgMusic = null;
 let clickSound = null;
 let successSound = null;
 let failSound = null;
-let shurikSound = null;
-let simbaSound = null;
-let kakoshkaSound = null;
-let meowSound = null;
 
 // Переменные для управления диалогами
 let currentDialogTimeout = null;
-let dialogInterval = null;
-let availableDialogues = [];
 let lastDialogue = null;
 
 // Инициализация звуков
@@ -41,127 +34,31 @@ function initSounds() {
 
     failSound = new Audio('/static/sounds/fail.mp3');
     failSound.volume = 0.3;
-
-    shurikSound = new Audio('/static/sounds/shurik_sound.mp3');
-    shurikSound.volume = 0.5;
-
-    simbaSound = new Audio('/static/sounds/simba_sound.mp3');
-    simbaSound.volume = 0.5;
-
-    kakoshkaSound = new Audio('/static/sounds/kakoshka_sound.mp3');
-    kakoshkaSound.volume = 0.5;
-
-    meowSound = new Audio('/static/sounds/meow.mp3');
-    meowSound.volume = 0.4;
 }
 
-// Воспроизведение звука персонажа
-function playCharacterSound(character) {
-    if (!characterVoiceEnabled) return;
-
-    let sound = null;
-
-    switch(character) {
-        case 'shurik':
-            sound = shurikSound;
-            break;
-        case 'simba':
-            sound = simbaSound;
-            break;
-        case 'kakoshka':
-            sound = kakoshkaSound;
-            break;
-        default:
-            sound = meowSound;
-    }
-
-    if (sound) {
-        sound.currentTime = 0;
-        sound.play().catch(error => {
-            console.log('Звук персонажа не воспроизведен:', error);
-            if (meowSound) {
-                meowSound.currentTime = 0;
-                meowSound.play().catch(() => {});
-            }
-        });
-    }
-}
-
-// Загрузка реплик
-async function loadDialogues() {
+// Загрузка настроек
+async function loadSettings() {
     try {
-        const response = await fetch('/api/get_dialogues');
-        const data = await response.json();
-        if (data.dialogues && data.dialogues.length > 0) {
-            availableDialogues = data.dialogues;
-        } else {
-            availableDialogues = [
-                { character: 'shurik', line: 'Мяу! Думай лучше!' },
-                { character: 'shurik', line: 'Хорошая попытка!' },
-                { character: 'shurik', line: 'Почти получилось!' },
-                { character: 'simba', line: 'Ррр! Я помогу тебе!' },
-                { character: 'simba', line: 'Следующая буква близко!' },
-                { character: 'kakoshka', line: 'Мур-мяу! Ты справишься!' },
-                { character: 'kakoshka', line: 'Я верю в тебя!' },
-                { character: 'kakoshka', line: 'Еще немного!' }
-            ];
-        }
+        const response = await fetch('/get_settings');
+        const settings = await response.json();
+
+        const volume = settings.volume || 50;
+        dialogSoundEnabled = settings.dialogSound !== false;
+        keyboardSoundEnabled = settings.keyboardSound !== false;
+
+        if (bgMusic) bgMusic.volume = volume / 100;
+        if (clickSound) clickSound.volume = (volume / 100) * 0.3;
+        if (successSound) successSound.volume = (volume / 100) * 0.4;
+        if (failSound) failSound.volume = (volume / 100) * 0.3;
+
     } catch (error) {
-        console.log('Ошибка загрузки реплик, использую стандартные');
-        availableDialogues = [
-            { character: 'shurik', line: 'Мяу! Думай лучше!' },
-            { character: 'shurik', line: 'Хорошая попытка!' },
-            { character: 'simba', line: 'Ррр! Я помогу тебе!' },
-            { character: 'kakoshka', line: 'Мур-мяу! Ты справишься!' }
-        ];
-    }
-}
-
-// Получить случайную реплику (без повторения предыдущей)
-function getRandomDialogue() {
-    if (availableDialogues.length === 0) return null;
-
-    if (!lastDialogue || availableDialogues.length === 1) {
-        const randomIndex = Math.floor(Math.random() * availableDialogues.length);
-        lastDialogue = availableDialogues[randomIndex];
-        return lastDialogue;
-    }
-
-    let filteredDialogues = availableDialogues.filter(d =>
-        d.character !== lastDialogue.character || d.line !== lastDialogue.line
-    );
-
-    if (filteredDialogues.length === 0) {
-        filteredDialogues = availableDialogues;
-    }
-
-    const randomIndex = Math.floor(Math.random() * filteredDialogues.length);
-    lastDialogue = filteredDialogues[randomIndex];
-    return lastDialogue;
-}
-
-// Обновление содержимого диалога
-function updateDialogContent(dialogElement, dialog, catImage, characterName, characterEmoji) {
-    dialogElement.innerHTML = `
-        <div class="dialog-wrapper">
-            <img src="${catImage}" alt="${characterName}" class="dialog-cat" onerror="this.style.display='none'; this.parentElement.querySelector('.dialog-cat-fallback').style.display='flex'">
-            <div class="dialog-cat-fallback" style="display: none;">
-                ${characterEmoji}
-            </div>
-            <div class="dialog-bubble">
-                <div class="dialog-name">${characterName}</div>
-                <div class="dialog-line">✨ "${dialog.line}" ✨</div>
-            </div>
-        </div>
-    `;
-
-    const img = dialogElement.querySelector('.dialog-cat');
-    if (img) {
-        img.onerror = function() {
-            this.style.display = 'none';
-            const fallback = dialogElement.querySelector('.dialog-cat-fallback');
-            if (fallback) fallback.style.display = 'flex';
-        };
+        const savedSettings = localStorage.getItem('meowdex_settings');
+        if (savedSettings) {
+            const settings = JSON.parse(savedSettings);
+            if (bgMusic) bgMusic.volume = (settings.volume || 50) / 100;
+            keyboardSoundEnabled = settings.keyboardSound !== false;
+            dialogSoundEnabled = settings.dialogSound !== false;
+        }
     }
 }
 
@@ -177,15 +74,12 @@ function showDialogWithAnimation(dialogElement) {
     }, 10);
 }
 
-// Показать случайную реплику
-function showRandomDialog() {
+// Показать реплику
+function showCharacterDialog(dialog) {
     if (!dialogSoundEnabled) return;
     if (isGameOver) return;
 
-    const dialog = getRandomDialogue();
-    if (!dialog) return;
-
-    playCharacterSound(dialog.character);
+    if (!dialog || !dialog.line) return;
 
     let dialogElement = document.getElementById('characterDialog');
 
@@ -214,17 +108,29 @@ function showRandomDialog() {
         characterEmoji = '🐱';
     }
 
-    if (dialogElement.style.display === 'block') {
-        dialogElement.style.opacity = '0';
-        dialogElement.style.transform = 'translateY(30px) scale(0.95)';
-        setTimeout(() => {
-            updateDialogContent(dialogElement, dialog, catImage, characterName, characterEmoji);
-            showDialogWithAnimation(dialogElement);
-        }, 300);
-    } else {
-        updateDialogContent(dialogElement, dialog, catImage, characterName, characterEmoji);
-        showDialogWithAnimation(dialogElement);
+    dialogElement.innerHTML = `
+        <div class="dialog-wrapper">
+            <img src="${catImage}" alt="${characterName}" class="dialog-cat" onerror="this.style.display='none'; this.parentElement.querySelector('.dialog-cat-fallback').style.display='flex'">
+            <div class="dialog-cat-fallback" style="display: none;">
+                ${characterEmoji}
+            </div>
+            <div class="dialog-bubble">
+                <div class="dialog-name">${characterName}</div>
+                <div class="dialog-line">✨ "${dialog.line}" ✨</div>
+            </div>
+        </div>
+    `;
+
+    const img = dialogElement.querySelector('.dialog-cat');
+    if (img) {
+        img.onerror = function() {
+            this.style.display = 'none';
+            const fallback = dialogElement.querySelector('.dialog-cat-fallback');
+            if (fallback) fallback.style.display = 'flex';
+        };
     }
+
+    showDialogWithAnimation(dialogElement);
 
     if (currentDialogTimeout) {
         clearTimeout(currentDialogTimeout);
@@ -242,15 +148,14 @@ function showRandomDialog() {
                 }
             }, 300);
         }
-    }, 8000);
+    }, 6000);
 }
 
-// Показать финальную реплику
+// Показать финальную реплику (не исчезает)
 function showFinalDialog(dialog) {
     if (!dialogSoundEnabled) return;
 
-    lastDialogue = null;
-    playCharacterSound(dialog.character);
+    if (!dialog || !dialog.line) return;
 
     let dialogElement = document.getElementById('characterDialog');
 
@@ -301,40 +206,11 @@ function showFinalDialog(dialog) {
         };
     }
 
-    dialogElement.style.display = 'block';
-    dialogElement.style.opacity = '0';
-    dialogElement.style.transform = 'translateY(30px) scale(0.95)';
-    setTimeout(() => {
-        dialogElement.style.transition = 'all 0.3s ease';
-        dialogElement.style.opacity = '1';
-        dialogElement.style.transform = 'translateY(0) scale(1)';
-    }, 10);
-}
-
-// Запуск интервала со случайными репликами
-function startRandomDialogueInterval() {
-    if (dialogInterval) {
-        clearInterval(dialogInterval);
-    }
-
-    dialogInterval = setInterval(() => {
-        if (!isGameOver && dialogSoundEnabled) {
-            showRandomDialog();
-        }
-    }, 12000);
-}
-
-// Остановка интервала реплик
-function stopRandomDialogueInterval() {
-    if (dialogInterval) {
-        clearInterval(dialogInterval);
-        dialogInterval = null;
-    }
+    showDialogWithAnimation(dialogElement);
 }
 
 // Сброс состояния реплик
 function resetDialogState() {
-    lastDialogue = null;
     if (currentDialogTimeout) {
         clearTimeout(currentDialogTimeout);
         currentDialogTimeout = null;
@@ -344,12 +220,6 @@ function resetDialogState() {
 // Показать результат игры
 function showGameResult(result, secretWord) {
     isGameOver = true;
-    stopRandomDialogueInterval();
-
-    const finalDialog = getRandomDialogue();
-    if (finalDialog) {
-        showFinalDialog(finalDialog);
-    }
 
     const resultOverlay = document.createElement('div');
     resultOverlay.className = 'result-overlay';
@@ -588,42 +458,44 @@ function stopRain() {
     }
 }
 
-// Загрузка настроек
-async function loadSettings() {
-    try {
-        const response = await fetch('/get_settings');
-        const settings = await response.json();
+// Запуск фоновой музыки
+function startBackgroundMusic() {
+    if (bgMusic && musicEnabled && bgMusic.paused) {
+        bgMusic.play().catch(error => {
+            console.log('Автовоспроизведение заблокировано');
+            showMusicButton();
+        });
+    }
+}
 
-        const volume = settings.volume || 50;
-        dialogSoundEnabled = settings.dialogSound !== false;
-        keyboardSoundEnabled = settings.keyboardSound !== false;
-        characterVoiceEnabled = settings.characterVoice !== false;
-
-        if (bgMusic) bgMusic.volume = volume / 100;
-        if (clickSound) clickSound.volume = (volume / 100) * 0.3;
-        if (successSound) successSound.volume = (volume / 100) * 0.4;
-        if (failSound) failSound.volume = (volume / 100) * 0.3;
-        if (shurikSound) shurikSound.volume = (volume / 100) * 0.5;
-        if (simbaSound) simbaSound.volume = (volume / 100) * 0.5;
-        if (kakoshkaSound) kakoshkaSound.volume = (volume / 100) * 0.5;
-        if (meowSound) meowSound.volume = (volume / 100) * 0.4;
-
-    } catch (error) {
-        const savedSettings = localStorage.getItem('meowdex_settings');
-        if (savedSettings) {
-            const settings = JSON.parse(savedSettings);
-            if (bgMusic) bgMusic.volume = (settings.volume || 50) / 100;
-            keyboardSoundEnabled = settings.keyboardSound !== false;
-            dialogSoundEnabled = settings.dialogSound !== false;
-            characterVoiceEnabled = settings.characterVoice !== false;
-        }
+function showMusicButton() {
+    let musicBtn = document.getElementById('musicStartBtn');
+    if (!musicBtn) {
+        musicBtn = document.createElement('button');
+        musicBtn.id = 'musicStartBtn';
+        musicBtn.textContent = '🔊 ВКЛЮЧИТЬ МУЗЫКУ';
+        musicBtn.style.position = 'fixed';
+        musicBtn.style.bottom = '100px';
+        musicBtn.style.left = '50%';
+        musicBtn.style.transform = 'translateX(-50%)';
+        musicBtn.style.padding = '10px 20px';
+        musicBtn.style.background = '#2c2c2c';
+        musicBtn.style.color = '#FFD700';
+        musicBtn.style.border = '2px solid #8B7355';
+        musicBtn.style.fontFamily = 'Courier New, monospace';
+        musicBtn.style.cursor = 'pointer';
+        musicBtn.style.zIndex = '1000';
+        musicBtn.onclick = () => {
+            bgMusic.play();
+            musicBtn.remove();
+        };
+        document.body.appendChild(musicBtn);
     }
 }
 
 // Начать новую игру
 async function startNewGame() {
     isGameOver = false;
-    stopRandomDialogueInterval();
     resetDialogState();
 
     const dialogElement = document.getElementById('characterDialog');
@@ -638,13 +510,15 @@ async function startNewGame() {
         });
         const data = await response.json();
 
+        if (data.dialog && data.dialog.line) {
+            showCharacterDialog(data.dialog);
+        }
+
         resetGameUI();
-        startRandomDialogueInterval();
 
     } catch (error) {
         console.error('Ошибка начала игры:', error);
         resetGameUI();
-        startRandomDialogueInterval();
     }
 }
 
@@ -661,19 +535,41 @@ async function submitGuess(word) {
         });
         const data = await response.json();
 
+        if (data.dialog && data.dialog.line) {
+            showCharacterDialog(data.dialog);
+        }
+
         updateBoardColors(data.colors, currentAttempt);
         updateKeyboardState(data.keyboard);
 
         if (data.status === 'win') {
             if (successSound) successSound.play();
+
+            if (typeof window.updatePlayerStats === 'function') {
+                window.updatePlayerStats(true);
+            }
+
+            if (data.dialog && data.dialog.line) {
+                showFinalDialog(data.dialog);
+            }
+
             showGameResult('win', data.secret_word);
             return true;
         } else if (data.status === 'lose') {
             if (failSound) failSound.play();
+
+            if (typeof window.updatePlayerStats === 'function') {
+                window.updatePlayerStats(false);
+            }
+
+            if (data.dialog && data.dialog.line) {
+                showFinalDialog(data.dialog);
+            }
+
             showGameResult('lose', data.secret_word);
             return true;
         } else {
-            currentAttempt++;
+            currentAttempt = data.attempt;
             currentLetterIndex = 0;
         }
 
@@ -838,72 +734,23 @@ function createTiles() {
     gameGrid.appendChild(tileContainer);
 }
 
-// Запуск фоновой музыки
-function startBackgroundMusic() {
-    if (bgMusic && musicEnabled && bgMusic.paused) {
-        bgMusic.play().catch(error => {
-            console.log('Автовоспроизведение заблокировано');
-            showMusicButton();
-        });
-    }
-}
-
-function showMusicButton() {
-    let musicBtn = document.getElementById('musicStartBtn');
-    if (!musicBtn) {
-        musicBtn = document.createElement('button');
-        musicBtn.id = 'musicStartBtn';
-        musicBtn.textContent = '🔊 ВКЛЮЧИТЬ МУЗЫКУ';
-        musicBtn.style.position = 'fixed';
-        musicBtn.style.bottom = '100px';
-        musicBtn.style.left = '50%';
-        musicBtn.style.transform = 'translateX(-50%)';
-        musicBtn.style.padding = '10px 20px';
-        musicBtn.style.background = '#2c2c2c';
-        musicBtn.style.color = '#FFD700';
-        musicBtn.style.border = '2px solid #8B7355';
-        musicBtn.style.fontFamily = 'Courier New, monospace';
-        musicBtn.style.cursor = 'pointer';
-        musicBtn.style.zIndex = '1000';
-        musicBtn.onclick = () => {
-            bgMusic.play();
-            musicBtn.remove();
-        };
-        document.body.appendChild(musicBtn);
-    }
-}
-
 // Обновление настроек из страницы настроек
-window.updateGameSettings = function(volume, keyboardSound, characterVoice, dialogSound) {
+window.updateGameSettings = function(volume, keyboardSound, dialogSound) {
     if (bgMusic) bgMusic.volume = volume / 100;
     if (clickSound) clickSound.volume = (volume / 100) * 0.3;
     if (successSound) successSound.volume = (volume / 100) * 0.4;
     if (failSound) failSound.volume = (volume / 100) * 0.3;
-    if (shurikSound) shurikSound.volume = (volume / 100) * 0.5;
-    if (simbaSound) simbaSound.volume = (volume / 100) * 0.5;
-    if (kakoshkaSound) kakoshkaSound.volume = (volume / 100) * 0.5;
-    if (meowSound) meowSound.volume = (volume / 100) * 0.4;
 
     keyboardSoundEnabled = keyboardSound;
-    characterVoiceEnabled = characterVoice !== undefined ? characterVoice : characterVoiceEnabled;
     dialogSoundEnabled = dialogSound !== undefined ? dialogSound : dialogSoundEnabled;
 
     const settings = {
         volume: volume,
         keyboardSound: keyboardSound,
         dialogSound: dialogSoundEnabled,
-        characterVoice: characterVoiceEnabled,
         timestamp: new Date().toISOString()
     };
     localStorage.setItem('meowdex_settings', JSON.stringify(settings));
-
-    if (dialogSoundEnabled && !isGameOver) {
-        if (!dialogInterval) {
-            startRandomDialogueInterval();
-        }
-    } else if (!dialogSoundEnabled && dialogInterval) {
-        stopRandomDialogueInterval();
-    }
 };
 
 // Функция для кнопки назад
@@ -916,7 +763,6 @@ function handleButtonClick(url) {
 // Инициализация игры
 document.addEventListener('DOMContentLoaded', async function() {
     initSounds();
-    await loadDialogues();
     await loadSettings();
     createTiles();
     resetGameUI();

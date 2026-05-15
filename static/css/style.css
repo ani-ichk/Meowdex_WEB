@@ -5,18 +5,214 @@
 }
 
 .background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("/static/data/images/background/blue_shtori.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 0;
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("/static/data/images/background/blue_shtori.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: 0;
+}
+
+/* Кнопка настроек в правом верхнем углу */
+.settings-btn-corner {
+    position: fixed;
+    top: 31px;
+    right: 262px;
+    z-index: 200;
+}
+
+.btn-settings-corner {
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 0;
+    width: 88px;
+    transition: transform 0.2s ease;
+}
+
+.btn-settings-corner img {
+    width: 100%;
+    height: auto;
+    display: block;
+    image-rendering: pixelated;
+}
+
+.btn-settings-corner:hover {
+    transform: scale(1.05);
+}
+
+.btn-settings-corner:active {
+    transform: scale(0.95);
+}
+
+/* Левая панель игрока */
+.player-panel {
+    position: fixed;
+    top: 50%;
+    left: 319px;
+    transform: translateY(-50%);
+    width: 362px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #FFD700;
+    border-radius: 15px;
+    overflow: hidden;
+    z-index: 100;
+}
+.retro-input {
+    background: #1a1a1a;
+    border: 1px solid #8B7355;
+    color: #FFD700;
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    padding: 12px 15px;
+    /* Убедитесь, что нет свойства, блокирующего ввод */
+    -webkit-user-select: text;
+    user-select: text;
+}
+.player-panel-bg {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-
-    background-image: url("/static/data/images/background/blue_shtori.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    opacity: 0.3;
+    z-index: 0;
 }
 
+.player-panel-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.player-panel-content {
+    position: relative;
+    z-index: 1;
+    padding: 25px 20px;
+    text-align: center;
+}
+
+.player-avatar {
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.avatar-img {
+    width: 97px;
+    height: 98px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    border-radius: 50%;
+    background: rgba(255, 215, 0, 0.2);
+    padding: 8px;
+    border: 2px solid #FFD700;
+    transition: transform 0.2s ease;
+}
+
+.avatar-img:hover {
+    transform: scale(1.05);
+}
+
+.player-name {
+    font-family: 'Courier New', monospace;
+    font-size: 47px;
+    font-weight: bold;
+    color: #FFD700;
+    text-shadow: 2px 2px 0px #8B4513;
+    margin-bottom: 20px;
+    word-break: break-all;
+}
+
+.player-stats {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid #8B7355;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 20px;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-family: 'Courier New', monospace;
+    border-bottom: 1px dashed #8B7355;
+}
+
+.stat-item:last-child {
+    border-bottom: none;
+}
+
+.stat-icon {
+    font-size: 22px;
+}
+
+.stat-label {
+    flex: 1;
+    margin-left: 8px;
+    color: #aaa;
+    font-size: 27px;
+}
+
+.stat-value {
+    color: #FFD700;
+    font-weight: bold;
+    font-size: 26px;
+}
+
+.player-logout-btn, .player-login-btn {
+    width: 100%;
+    padding: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.player-logout-btn {
+    background: #8B4513;
+    color: #FFD700;
+}
+
+.player-login-btn {
+    background: #FFD700;
+    color: #2c2c2c;
+}
+
+.player-logout-btn:hover, .player-login-btn:hover {
+    transform: scale(1.02);
+    filter: brightness(1.1);
+}
+
+/* Центральный контент - полностью по центру */
 .content {
     position: relative;
     z-index: 1;
@@ -36,7 +232,7 @@
     z-index: 1;
 }
 
-.logo img{
+.logo img {
     max-width: 500px;
     height: auto;
     display: block;
@@ -44,38 +240,35 @@
 
 .btn-container {
     position: absolute;
-    top: 64%;
+    top: 76%;
     left: 50%;
     transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 35px;
     align-items: center;
     z-index: 1;
     width: auto;
-    max-width: none;
 }
 
+/* УВЕЛИЧЕННЫЕ КНОПКИ */
 .btn {
     display: block;
     cursor: pointer;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition: transform 0.2s ease;
     border: none;
     background: none;
     padding: 0;
-    width: 300px;
+    width: 350px;  /* Было 250px - увеличены */
 }
 
 .btn img {
     width: 100%;
     height: auto;
     display: block;
-    border-radius: 10px;
-    transition: all 0.3s ease;
 }
 
-
- .btn:hover {
+.btn:hover {
     transform: scale(1.05);
 }
 
@@ -83,38 +276,182 @@
     transform: scale(0.95);
 }
 
-.btn-link-set {
-    position: absolute;
-    top: 20px;
-    right: 230px;
-    z-index: 2;
+/* Bootstrap ретро стилизация - УВЕЛИЧЕННЫЙ ТЕКСТ */
+.retro-modal {
+    background: #2c2c2c;
+    border: 3px solid #FFD700;
+    border-radius: 15px;
 }
 
-.btn-set {
-    display: block;
-    cursor: pointer;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+.retro-modal-header {
+    border-bottom: 2px solid #FFD700;
+    background: #1a1a1a;
+    color: #FFD700;
+    font-family: 'Courier New', monospace;
+    padding: 20px 25px;
+}
+
+.retro-modal-header .modal-title {
+    font-weight: bold;
+    font-size: 22px;  /* Увеличен */
+}
+
+.retro-modal-footer {
+    border-top: 1px solid #8B7355;
+    background: #1a1a1a;
+    color: #aaa;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;  /* Увеличен */
+    padding: 15px 20px;
+}
+
+.retro-label {
+    color: #FFD700;
+    font-family: 'Courier New', monospace;
+    font-size: 16px;  /* Увеличен */
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+}
+
+.retro-input, .retro-select {
+    background: #1a1a1a;
+    border: 1px solid #8B7355;
+    color: #FFD700;
+    font-family: 'Courier New', monospace;
+    font-size: 16px;  /* Увеличен */
+    padding: 12px 15px;
+}
+
+.retro-input:focus, .retro-select:focus {
+    background: #2a2a2a;
+    border-color: #FFD700;
+    color: #FFD700;
+    box-shadow: none;
+}
+
+.retro-checkbox {
+    background: #1a1a1a;
+    border: 1px solid #8B7355;
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+}
+
+.retro-checkbox:checked {
+    background-color: #FFD700;
+    border-color: #FFD700;
+}
+
+.retro-check-label {
+    color: #aaa;
+    font-family: 'Courier New', monospace;
+    font-size: 15px;  /* Увеличен */
+}
+
+.retro-submit-btn {
+    background: #FFD700;
+    color: #2c2c2c;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    padding: 14px 20px;
+    font-size: 18px;  /* Увеличен */
     border: none;
-    background: none;
-    padding: 0;
-    width: 60px;
+    transition: all 0.2s ease;
 }
 
-.btn-set img {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 10px;
-    transition: all 0.3s ease;
+.retro-submit-btn:hover {
+    background: #ffaa00;
+    transform: scale(1.02);
 }
 
- .btn-set:hover {
-    transform: scale(1.05);
+.modal-body {
+    padding: 25px;
 }
 
-.btn-set:active {
-    transform: scale(0.95);
+/* Адаптив */
+@media (max-width: 1024px) {
+    .btn {
+        width: 280px;
+    }
+
+    .btn-container {
+        gap: 30px;
+    }
 }
 
+@media (max-width: 768px) {
+    .player-panel {
+        width: 240px;
+        left: 10px;
+    }
 
+    .avatar-img {
+        width: 60px;
+        height: 60px;
+    }
 
+    .player-name {
+        font-size: 18px;
+    }
+
+    .stat-label {
+        font-size: 10px;
+    }
+
+    .stat-value {
+        font-size: 14px;
+    }
+
+    .btn-settings-corner {
+        width: 50px;
+        top: 15px;
+        right: 15px;
+    }
+
+    .logo img {
+        max-width: 200px;
+    }
+
+    .btn {
+        width: 220px;
+    }
+
+    .btn-container {
+        gap: 25px;
+    }
+
+    .retro-modal-header .modal-title {
+        font-size: 16px;
+    }
+
+    .retro-label {
+        font-size: 12px;
+    }
+
+    .retro-input, .retro-select {
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+
+    .retro-submit-btn {
+        font-size: 14px;
+        padding: 10px 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .player-panel {
+        display: none;
+    }
+
+    .btn-settings-corner {
+        width: 40px;
+        top: 10px;
+        right: 10px;
+    }
+
+    .btn {
+        width: 180px;
+    }
+}

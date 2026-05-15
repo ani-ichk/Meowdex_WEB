@@ -2,11 +2,57 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/static/css/style.css"/>
-    <title>Meowdex</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <title>Meowdex - Главная</title>
 </head>
 <body>
     <div class="background"></div>
+
+    <!-- Кнопка настроек в правом верхнем углу -->
+    <div class="settings-btn-corner">
+        <a href="/settings" class="btn-link">
+            <button class="btn-settings-corner">
+                <img src="/static/data/images/button/gear.png" alt="Настройки">
+            </button>
+        </a>
+    </div>
+
+    <!-- Левая панель с информацией об игроке -->
+    <div class="player-panel">
+        <div class="player-panel-content">
+            <div class="player-avatar">
+                <img src="/static/data/images/cats/simba.png" alt="Симба" class="avatar-img">
+            </div>
+            <div class="player-name" id="playerNameDisplay">Гость</div>
+            <div class="player-stats">
+                <div class="stat-item">
+                    <span class="stat-icon">🏆</span>
+                    <span class="stat-label">Победы:</span>
+                    <span class="stat-value" id="playerWins">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">😔</span>
+                    <span class="stat-label">Поражения:</span>
+                    <span class="stat-value" id="playerLosses">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">🎮</span>
+                    <span class="stat-label">Всего игр:</span>
+                    <span class="stat-value" id="playerGames">0</span>
+                </div>
+            </div>
+            <button class="player-logout-btn" id="logoutBtn" style="display: none;" onclick="logoutPlayer()">
+                Выйти из аккаунта
+            </button>
+            <button class="player-login-btn" id="loginBtn" onclick="showRegistrationModal()">
+                🎮 Войти в игру
+            </button>
+        </div>
+    </div>
+
+    <!-- Центральный контент -->
     <div class="content">
         <div class="logo">
             <img src="/static/data/images/icons/logo.png" alt="Логотип Meowdex">
@@ -14,25 +60,66 @@
 
         <div class="btn-container">
             <a href="/game" class="btn-link">
-            <button class="btn" onclick="handleButtonClick('game')">
-                <img src="/static/data/images/button/play_btn.png" alt="Кнопка играть">
-            </button>
+                <button class="btn">
+                    <img src="/static/data/images/button/play_btn.png" alt="Кнопка играть">
+                </button>
             </a>
 
             <a href="/rules" class="btn-link">
-            <button class="btn">
-                <img src="/static/data/images/button/rules_btn.png" alt="Кнопка правила">
-            </button>
+                <button class="btn">
+                    <img src="/static/data/images/button/rules_btn.png" alt="Кнопка правила">
+                </button>
             </a>
         </div>
     </div>
 
-    <a href="/settings" class="btn-link-set">
-        <button class="btn-set">
-            <img src="/static/data/images/button/gear.png" alt="Кнопка настройки">
-        </button>
-    </a>
+    <!-- Модальное окно регистрации -->
+    <div class="modal fade" id="registrationModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content retro-modal">
+                <div class="modal-header retro-modal-header">
+                    <h5 class="modal-title">ЗАЯВКА НА УЧАСТИЕ В ТВ-ШОУ "MEOWDEX"</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="registrationForm">
+                        <div class="mb-4">
+                            <label class="form-label retro-label">🐱 ВАШЕ ИМЯ *</label>
+                            <input type="text" class="form-control retro-input" id="playerName" placeholder="Напишите ваше имя">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label retro-label">🎨 ЛЮБИМЫЙ ЦВЕТ</label>
+                            <select class="form-select retro-select" id="playerFavoriteColor">
+                                <option value="">Выберите цвет</option>
+                                <option value="red">🔴 Красный</option>
+                                <option value="blue">🔵 Синий</option>
+                                <option value="green">🟢 Зеленый</option>
+                                <option value="yellow">🟡 Желтый</option>
+                                <option value="purple">🟣 Фиолетовый</option>
+                                <option value="orange">🟠 Оранжевый</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label retro-label">⭐ ЛЮБИМОЕ СЛОВО</label>
+                            <input type="text" class="form-control retro-input" id="playerFavoriteWord" placeholder="Ваше любимое слово">
+                        </div>
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" class="form-check-input retro-checkbox" id="rulesAgree">
+                            <label class="form-check-label retro-check-label" for="rulesAgree">
+                                Я согласен с правилами игры
+                            </label>
+                        </div>
+                        <button type="button" class="btn retro-submit-btn w-100" onclick="handleRegistrationClick()">✨ СТАТЬ УЧАСТНИКОМ ✨</button>
+                    </form>
+                </div>
+                <div class="modal-footer retro-modal-footer">
+                    <p class="mb-0">⭐ Ведущие - котики Шурик, Симба и Какошка ждут вас!</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/profile.js"></script>
 </body>
 </html>
